@@ -1,9 +1,4 @@
-import OpenAI from "openai";
 import { NextResponse } from "next/server";
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 export async function POST(request: Request) {
   try {
@@ -22,50 +17,29 @@ export async function POST(request: Request) {
       );
     }
 
-    const prompt = `
-You are MOO TODAY, a friendly, elegant, and mystical fortune guide.
+    const fortuneMessages: Record<string, string> = {
+      Career:
+        "This is a good time to focus on your goals and take steady steps forward. Stay confident, pay attention to opportunities, and trust your ability to learn and adapt.",
 
-Create a personalized fortune reading for this user.
+      Finance:
+        "Your financial energy encourages balance and thoughtful decisions. Avoid unnecessary spending, focus on your priorities, and look for ways to build greater stability.",
 
-Name: ${name}
-Birth date: ${birthDate}
-Zodiac sign: ${zodiac}
-Fortune category: ${category}
+      Love:
+        "Your relationship energy is open to meaningful connections. Be honest about your feelings, communicate clearly, and give genuine connections room to grow.",
 
-Write the reading in English.
+      Health:
+        "Your energy suggests taking better care of yourself and finding a healthy balance between work and rest. Small positive habits can make a meaningful difference.",
+    };
 
-Requirements:
-- 2-3 short paragraphs
-- Warm, positive, and encouraging
-- Make the reading feel personalized
-- Give practical advice
-- Keep it entertaining
-- Do not claim supernatural certainty
-- Do not make medical, financial, or legal guarantees
-- Do not mention that you are an AI
-- End with one short positive sentence
-
-The style should feel:
-- elegant
-- magical
-- modern
-- warm
-- premium
-- suitable for MOO TODAY
-`;
-
-    const response = await openai.responses.create({
-      model: "gpt-5-mini",
-      input: prompt,
-    });
+    const fortune =
+      fortuneMessages[category] ||
+      "Today is a good opportunity to slow down, reflect, and move forward with confidence. Trust yourself and focus on the positive possibilities ahead.";
 
     return NextResponse.json({
-      fortune: response.output_text,
+      fortune,
     });
   } catch (error) {
-    console.error("========== AI FORTUNE ERROR ==========");
-    console.error(error);
-    console.error("======================================");
+    console.error("FORTUNE ERROR:", error);
 
     return NextResponse.json(
       {
